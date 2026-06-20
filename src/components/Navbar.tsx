@@ -414,6 +414,7 @@ export function Navbar({ theme, setTheme, scrollToSection }: NavbarProps) {
                             <a
                               href={`#services?service=${encodeURIComponent(item.title)}`}
                               onMouseEnter={() => setHoveredSubService(item.title)}
+                              onClick={() => setActiveMenuValue("")}
                               className="block select-none rounded-xl p-2 text-xs font-semibold leading-normal no-underline outline-none transition-all duration-150 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-[#7342E2] dark:hover:text-[#a882fa] text-neutral-700 dark:text-neutral-355 border border-transparent hover:border-neutral-100 dark:hover:border-neutral-800"
                             >
                               {item.title}

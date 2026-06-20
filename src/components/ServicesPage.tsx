@@ -11,8 +11,6 @@ import {
   Check, 
   Home, 
   FileText, 
-  HelpCircle, 
-  Layers, 
   ChevronLeft
 } from "lucide-react";
 
@@ -45,6 +43,88 @@ const CATEGORIES_DATA = [
           { name: "NOC from the owner for using the premises (In case Rented)", desc: "No objection certificate" },
           { name: "ID proof (Passport/Voter’s id card/Driving license)", desc: "Identity verification" },
           { name: "Address Proof: (Bank Account Statement, Electricity Bill)", desc: "Business address validation" }
+        ],
+        benefits: [
+          {
+            title: "Ease of Formation",
+            desc: "Creating a partnership firm is simple, and there aren't many legal steps involved. This means you can start your business as soon as you and your partners sign the partnership agreement. However, it's a good idea to register your partnership firm because it comes with added advantages."
+          },
+          {
+            title: "Selection of a Firm’s Name",
+            desc: "When you and your partners decide on a name for your business, make sure it's unique. Check that it doesn't copy someone else's name or trademark. It's also a good idea to get a trademark for your chosen name so others can't use it for their business."
+          },
+          {
+            title: "Better Management",
+            desc: "In a partnership firm, when business owners work together, they take good care of managing their business. They do this because they own the business together and want to make sure it runs smoothly and makes money."
+          },
+          {
+            title: "Shared Management",
+            desc: "In a partnership, every partner has equal rights to manage the business. However, if it suits your needs, some partners can take on the role of managing partners, while others can choose to let them handle the management tasks. All partners share various responsibilities in the business."
+          },
+          {
+            title: "Free from Statutory Audits",
+            desc: "You don't have to go through statutory audits if you're running a partnership firm. This means you're not required to submit audited financial statements to the registrar of firms. However, be aware that you might still need to undergo tax audits under the Income Tax Act if your income exceeds certain limits."
+          },
+          {
+            title: "Limited Compliances and Regulations",
+            desc: "Unlike a company or LLP, a partnership firm doesn't have many yearly or event-related rules to follow."
+          },
+          {
+            title: "Winding Up of a Partnership Firm",
+            desc: "To close a partnership business, you just need to create a dissolution document. If the partnership is registered, you must inform the Registrar of Firms (ROF). Unlike companies or LLPs, closing a partnership business involves fewer legal steps."
+          }
+        ],
+        processSteps: [
+          {
+            title: "Choose a Plan",
+            desc: "You can pick any of our plans that suit what you need."
+          },
+          {
+            title: "Gathering of Details and Drafting of the Deed",
+            desc: "After learning about your partnership setup, business needs, and other terms, we'll provide you with the initial version of the document within four working days."
+          },
+          {
+            title: "The Final Draft and Approval",
+            desc: "At MyEfilings, we assist you with making changes twice, if needed."
+          },
+          {
+            title: "Registration Process",
+            desc: "After that, we create the final partnership document."
+          },
+          {
+            title: "Applying for PAN & TAN",
+            desc: "To register your partnership firm, you need to do it through the Registrar of Firms (ROF)."
+          },
+          {
+            title: "Successful Registration",
+            desc: "We at MyEfilings will apply for Permanent Account Number (PAN) and Tax Deduction and Collection Account Number (TAN) of your partnership firm. Congratulations on registering successfully!"
+          }
+        ],
+        faqs: [
+          {
+            q: "What are the different types of Partnership Firms?",
+            a: "In India, partnership businesses follow the rules of the Indian Partnership Act of 1932. This law allows for two types of partnership firms: unregistered and registered. An unregistered firm is created through a partnership deed, while registered firms are also officially registered with the state's Registrar of Firms."
+          },
+          {
+            q: "What are the important details mentioned in a partnership deed?",
+            a: "A partnership agreement doesn't have a set format in the law. It can be written in any way, and it has information that partners agree on."
+          },
+          {
+            q: "Can I convert a Partnership Firm into a Private Limited Company or LLP?",
+            a: "Yes, you can easily convert a partnership firm into a Limited Liability Partnership (LLP) or a Private Limited Company. The steps for this are outlined in the Partnership Act of 1932."
+          },
+          {
+            q: "Do I have to file the annual return of the Partnership Firm?",
+            a: "Unlike a corporation or LLP, you don't have to submit annual reports for a partnership firm."
+          },
+          {
+            q: "Is filing ITR returns and tax audit mandatory for Partnership firms?",
+            a: "Yes, partnership firms must file Income Tax Returns every year by the specified deadline. It's compulsory. While there's no obligatory annual tax audit for all firms, if a firm's turnover exceeds Rs. 1 crore for business or Rs. 50 lakhs for professional services in a financial year, a tax audit is required for that particular year only."
+          },
+          {
+            q: "Who makes the managerial decisions in the partnership firm?",
+            a: "Well, because ownership and management are not separate in a partnership, the partners themselves are the ones in charge of running and overseeing the business."
+          }
         ],
         price: "1,999"
       },
@@ -799,9 +879,44 @@ export default function ServicesPage({ theme: _theme }: { theme?: "light" | "dar
   const [selectedService, setSelectedService] = useState<string>("Partnership");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [expandedCategory, setExpandedCategory] = useState<string | null>("start-business");
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
+  // Reset FAQ expansion when service changes
+  useEffect(() => {
+    setExpandedFaq(null);
+  }, [selectedService]);
 
   // Sync hash routing (e.g. #services?service=GST%20Registration)
   useEffect(() => {
+    const customSmoothScrollTo = (targetId: string, duration: number = 1200) => {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      
+      const startPosition = window.scrollY || window.pageYOffset;
+      const targetPosition = target.getBoundingClientRect().top + startPosition - 96;
+      const distance = targetPosition - startPosition;
+      let startTime: number | null = null;
+      
+      const animation = (currentTime: number) => {
+        if (startTime === null) startTime = currentTime;
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+        
+        // Easing: easeInOutCubic
+        const easeInOutCubic = progress < 0.5 
+          ? 4 * progress * progress * progress 
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+          
+        window.scrollTo(0, startPosition + distance * easeInOutCubic);
+        
+        if (timeElapsed < duration) {
+          requestAnimationFrame(animation);
+        }
+      };
+      
+      requestAnimationFrame(animation);
+    };
+
     const handleHashChange = () => {
       const hash = window.location.hash;
       if (hash.startsWith("#services")) {
@@ -824,6 +939,9 @@ export default function ServicesPage({ theme: _theme }: { theme?: "light" | "dar
               }
             });
             setSelectedService(matchedTitle);
+            setTimeout(() => {
+              customSmoothScrollTo("services-dashboard", 1250);
+            }, 100);
           }
         }
       }
@@ -1014,11 +1132,11 @@ export default function ServicesPage({ theme: _theme }: { theme?: "light" | "dar
       </DotGlobeHero>
 
       {/* SECTION 2: Full Width Services Dashboard */}
-      <div className="w-full border-t border-neutral-200 dark:border-neutral-900 bg-[#fafafa] dark:bg-black">
+      <div id="services-dashboard" className="w-full border-t border-neutral-200 dark:border-neutral-900 bg-[#fafafa] dark:bg-black">
         <div className="w-full flex flex-col lg:flex-row min-h-[700px]">
           
           {/* 1. LEFT SIDEBAR: SERVICES OUTLINE */}
-          <div className="w-full lg:w-80 border-r border-neutral-200 dark:border-neutral-900 bg-neutral-50 dark:bg-black flex flex-col shrink-0">
+          <div className="w-full lg:w-80 border-r border-neutral-200 dark:border-neutral-900 bg-neutral-50 dark:bg-black flex flex-col shrink-0 lg:sticky lg:top-24 lg:h-[calc(100vh-6rem)] lg:self-start">
             
             {/* Sidebar Header */}
             <div className="p-4 border-b border-neutral-200 dark:border-neutral-900 flex items-center justify-between">
@@ -1190,14 +1308,14 @@ export default function ServicesPage({ theme: _theme }: { theme?: "light" | "dar
             </div>
 
             {/* 2-Column Description & Image Section (Checklist & Documents) */}
-            <div className="p-6 border-b border-neutral-200 dark:border-zinc-900 bg-neutral-50/20 dark:bg-zinc-950/10">
-              <div className="flex flex-col md:flex-row gap-8 items-start">
+            <div className="p-6 md:p-10 border-b border-neutral-200 dark:border-zinc-900 bg-white dark:bg-black">
+              <div className="flex flex-col md:flex-row gap-10 items-start max-w-7xl mx-auto">
                 {/* Left Column: Description */}
-                <div className="flex-1 space-y-4">
-                  <h3 className="text-xl font-bold text-neutral-850 dark:text-neutral-250">
+                <div className="flex-1 space-y-5">
+                  <h3 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
                     Checklist & Documents
                   </h3>
-                  <div className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed space-y-3 font-medium text-justify">
+                  <div className="text-sm md:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed space-y-4 font-normal text-justify">
                     {activeService.longDesc.split("\n\n").map((p: string, i: number) => (
                       <p key={i}>{p}</p>
                     ))}
@@ -1205,14 +1323,12 @@ export default function ServicesPage({ theme: _theme }: { theme?: "light" | "dar
                 </div>
 
                 {/* Right Column: Certificate Image */}
-                <div className="w-full md:w-80 shrink-0 mx-auto">
-                  <div className="rounded-xl border border-neutral-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-2 shadow-md dark:shadow-none overflow-hidden max-w-full">
-                    <img 
-                      src={activeService.image} 
-                      alt={`${activeService.title} Visual`} 
-                      className="w-full h-auto rounded-lg object-contain bg-neutral-50 dark:bg-black" 
-                    />
-                  </div>
+                <div className="w-full md:w-[45%] shrink-0 max-w-[500px] mx-auto md:mx-0">
+                  <img 
+                    src={activeService.image} 
+                    alt={`${activeService.title} Visual`} 
+                    className="w-full h-auto object-contain bg-transparent border-0 shadow-none rounded-none" 
+                  />
                 </div>
               </div>
             </div>
@@ -1220,35 +1336,71 @@ export default function ServicesPage({ theme: _theme }: { theme?: "light" | "dar
             {/* Stacked details content stream (No tabs, all visible vertically) */}
             <div className="p-6 space-y-10">
               
-              {/* SECTION 1: Key Service Strengths */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2.5 pb-2 border-b border-neutral-100 dark:border-zinc-900">
-                  <Zap className="w-5 h-5 text-[#7342E2]" />
-                  <h3 className="text-sm font-bold text-neutral-850 dark:text-neutral-200 uppercase tracking-wider">
-                    Key Strengths & Advantages
-                  </h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {activeService.highlights.map((hl, i) => (
-                    <div 
-                      key={i} 
-                      className="p-4 rounded-xl border border-neutral-200 dark:border-zinc-900 bg-neutral-50/50 dark:bg-zinc-950/30 flex items-start gap-3 shadow-sm hover:shadow transition-shadow"
-                    >
-                      <div className="w-6 h-6 rounded-lg bg-[#7342E2]/10 text-[#7342E2] dark:text-[#a882fa] flex items-center justify-center shrink-0">
-                        <Check className="w-3.5 h-3.5 stroke-[3]" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <h5 className="text-xs font-bold text-neutral-800 dark:text-neutral-250">
-                          {hl}
-                        </h5>
-                        <p className="text-[10px] text-neutral-450 leading-relaxed">
-                          Ensuring standard compliant operation.
+              {/* SECTION 1: Key Service Strengths / Benefits */}
+              {(activeService as any).benefits ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2.5 pb-2 border-b border-neutral-100 dark:border-zinc-900">
+                    <Zap className="w-5 h-5 text-[#7342E2]" />
+                    <h3 className="text-sm font-bold text-neutral-855 dark:text-neutral-200 uppercase tracking-wider">
+                      Key Benefits & Advantages
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {(activeService as any).benefits.map((benefit: any, i: number) => (
+                      <div 
+                        key={i} 
+                        className="p-5 rounded-xl border border-neutral-200 dark:border-zinc-900 bg-neutral-50/50 dark:bg-zinc-950/20 flex flex-col gap-2 shadow-sm hover:shadow transition-shadow relative overflow-hidden group"
+                      >
+                        {/* Huge background number */}
+                        <div className="absolute right-4 bottom-1 text-6xl font-black text-neutral-200/10 dark:text-zinc-900/10 select-none group-hover:scale-105 transition-transform">
+                          {String(i + 1).padStart(2, '0')}
+                        </div>
+                        
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-6 h-6 rounded-lg bg-[#7342E2]/10 text-[#7342E2] dark:text-[#a882fa] flex items-center justify-center shrink-0 font-bold text-xs">
+                            {i + 1}
+                          </div>
+                          <h4 className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                            {benefit.title}
+                          </h4>
+                        </div>
+                        <p className="text-[10px] text-neutral-450 leading-relaxed z-10 pr-6 text-justify">
+                          {benefit.desc}
                         </p>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2.5 pb-2 border-b border-neutral-100 dark:border-zinc-900">
+                    <Zap className="w-5 h-5 text-[#7342E2]" />
+                    <h3 className="text-sm font-bold text-neutral-850 dark:text-neutral-200 uppercase tracking-wider">
+                      Key Strengths & Advantages
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {activeService.highlights.map((hl, i) => (
+                      <div 
+                        key={i} 
+                        className="p-4 rounded-xl border border-neutral-200 dark:border-zinc-900 bg-neutral-50/50 dark:bg-zinc-950/30 flex items-start gap-3 shadow-sm hover:shadow transition-shadow"
+                      >
+                        <div className="w-6 h-6 rounded-lg bg-[#7342E2]/10 text-[#7342E2] dark:text-[#a882fa] flex items-center justify-center shrink-0">
+                          <Check className="w-3.5 h-3.5 stroke-[3]" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <h5 className="text-xs font-bold text-neutral-800 dark:text-neutral-250">
+                            {hl}
+                          </h5>
+                          <p className="text-[10px] text-neutral-450 leading-relaxed">
+                            Ensuring standard compliant operation.
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* SECTION 2: Required Documents */}
               <div className="space-y-4">
@@ -1278,50 +1430,57 @@ export default function ServicesPage({ theme: _theme }: { theme?: "light" | "dar
                     </div>
                   ))}
                 </div>
-                {/* Important filing notice */}
-                <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-600 dark:text-amber-400 text-xs leading-relaxed flex gap-3">
-                  <HelpCircle className="w-5 h-5 shrink-0" />
-                  <div>
-                    <span className="font-bold">Important Notice:</span> Scanned copies or photographs are sufficient for the initial drafting. Physical documents are only required if state departments request physical affidavits in rare jurisdictions.
-                  </div>
-                </div>
               </div>
 
-              {/* SECTION 3: Step-by-Step Filing Process */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2.5 pb-2 border-b border-neutral-100 dark:border-zinc-900">
-                  <Layers className="w-5 h-5 text-[#7342E2]" />
-                  <h3 className="text-sm font-bold text-neutral-855 dark:text-neutral-200 uppercase tracking-wider">
-                    Step-by-Step Registration & Filing Process
-                  </h3>
-                </div>
-                
-                {/* Vertical Timeline */}
-                <div className="relative pl-6 space-y-6 border-l border-neutral-200 dark:border-neutral-900 ml-3 pt-1">
-                  {activeService.steps.map((step, idx) => (
-                    <div key={idx} className="relative group">
-                      {/* Circle indicator node */}
-                      <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full border-2 border-[#7342E2] bg-white dark:bg-black flex items-center justify-center shadow">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#7342E2] scale-100 group-hover:scale-125 transition-transform" />
-                      </div>
-                      
-                      <div className="bg-neutral-50/50 dark:bg-zinc-950/30 p-4 rounded-xl border border-neutral-200 dark:border-zinc-900 hover:border-neutral-300 dark:hover:border-neutral-800 transition-colors">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-extrabold text-[#7342E2] dark:text-[#a882fa] bg-[#7342E2]/10 px-2 py-0.5 rounded-full uppercase">
-                            Step {idx + 1}
-                          </span>
+              {/* SECTION 4: Frequently Asked Questions */}
+              {(activeService as any).faqs && (
+                <div className="space-y-4 pt-4">
+                  <div className="flex items-center gap-2.5 pb-2 border-b border-neutral-100 dark:border-zinc-900">
+                    <BookOpen className="w-5 h-5 text-[#7342E2]" />
+                    <h3 className="text-sm font-bold text-neutral-855 dark:text-neutral-200 uppercase tracking-wider">
+                      Frequently Asked Questions
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {(activeService as any).faqs.map((faq: any, idx: number) => {
+                      const isOpen = expandedFaq === idx;
+                      return (
+                        <div 
+                          key={idx}
+                          className="border border-neutral-200 dark:border-zinc-900 rounded-xl overflow-hidden bg-neutral-50/20 dark:bg-zinc-950/10"
+                        >
+                          <button
+                            onClick={() => setExpandedFaq(isOpen ? null : idx)}
+                            className="w-full px-5 py-4 flex items-center justify-between text-left font-semibold text-xs md:text-sm text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-zinc-900/40 transition-colors cursor-pointer"
+                          >
+                            <span>{faq.q}</span>
+                            <ChevronDown 
+                              className={`w-4 h-4 text-neutral-400 dark:text-neutral-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
+                            />
+                          </button>
+                          
+                          <AnimatePresence initial={false}>
+                            {isOpen && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="px-5 pb-4 pt-1 text-xs md:text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed border-t border-neutral-100 dark:border-zinc-900/60 mt-1 text-justify">
+                                  {faq.a}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
-                        <h4 className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
-                          {step}
-                        </h4>
-                        <p className="text-[10px] text-neutral-450 mt-1 leading-relaxed">
-                          This phase is managed entirely online by our experts. Updates are shared dynamically under your project profile.
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
 
             </div>
           </div>

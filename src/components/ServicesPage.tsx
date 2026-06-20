@@ -27,6 +27,8 @@ const CATEGORIES_DATA = [
         duration: "3 days",
         tag: "POPULAR" as const,
         desc: "A business structure owned by two or more individuals. Ideal for small co-owned businesses.",
+        longDesc: "In India, creating a general partnership firm is an easy and common way to start a business. This type of business is formed by two or more people who are partners, working together. All the partners in the firm own, manage, and share the business’s earnings and responsibilities with each other.\n\nSetting up a partnership is easy, but partners have a lot of responsibilities. Partners can be personally responsible for any debts the partnership has, and even their personal belongings may be used to pay off the partnership’s debts. To register a partnership, partners need to agree on a name and create a partnership deed outlining each partner’s rights and duties.\n\nIf the partnership deed doesn’t cover something, the Indian Partnership Act 1932 rules will apply. Registering your partnership can provide advantages over being unregistered, so it’s a good idea to get it done.",
+        image: "/part.webp",
         highlights: ["Easy setup", "Low compliance costs", "Shared responsibility"],
         steps: [
           "Consultation & Partner Details Collection",
@@ -36,10 +38,13 @@ const CATEGORIES_DATA = [
           "Bank Account Opening Support"
         ],
         documents: [
-          { name: "PAN of all partners", desc: "For tax identity validation" },
-          { name: "Aadhaar / ID proof", desc: "For address & identity verification" },
-          { name: "Address proof of business", desc: "Utility bill or rent agreement" },
-          { name: "Partnership Deed", desc: "Notarized contract between partners" }
+          { name: "PAN Card of Partners", desc: "Mandatory tax registration identity proof" },
+          { name: "Partnership Deed", desc: "Outlining partners' rights and duties" },
+          { name: "Translated Partnership Deed", desc: "If deed is in regional language" },
+          { name: "PAN application form", desc: "Form 49A for firm PAN registration" },
+          { name: "NOC from the owner for using the premises (In case Rented)", desc: "No objection certificate" },
+          { name: "ID proof (Passport/Voter’s id card/Driving license)", desc: "Identity verification" },
+          { name: "Address Proof: (Bank Account Statement, Electricity Bill)", desc: "Business address validation" }
         ],
         price: "1,999"
       },
@@ -831,15 +836,34 @@ export default function ServicesPage({ theme: _theme }: { theme?: "light" | "dar
 
   // Find currently active service object
   const activeService = useMemo(() => {
+    let matchedServ = null;
+    let parentCat = null;
+    
     for (const cat of CATEGORIES_DATA) {
       const serv = cat.services.find(s => s.title === selectedService);
-      if (serv) return { ...serv, categoryId: cat.id, categoryName: cat.name };
+      if (serv) {
+        matchedServ = serv;
+        parentCat = cat;
+        break;
+      }
     }
-    // Fallback
+    
+    const baseService = matchedServ || CATEGORIES_DATA[0].services[0];
+    const catId = parentCat ? parentCat.id : CATEGORIES_DATA[0].id;
+    const catName = parentCat ? parentCat.name : CATEGORIES_DATA[0].name;
+    
+    // Determine fallback image based on category
+    let defaultImg = "/BSS.webp";
+    if (catId === "registrations") defaultImg = "/BRL.webp";
+    else if (catId === "taxation") defaultImg = "/ITG.webp";
+    else if (catId === "corporate") defaultImg = "/CLC.webp";
+    
     return {
-      ...CATEGORIES_DATA[0].services[0],
-      categoryId: CATEGORIES_DATA[0].id,
-      categoryName: CATEGORIES_DATA[0].name
+      ...baseService,
+      categoryId: catId,
+      categoryName: catName,
+      image: (baseService as any).image || defaultImg,
+      longDesc: (baseService as any).longDesc || baseService.desc
     };
   }, [selectedService]);
 
@@ -1161,6 +1185,34 @@ export default function ServicesPage({ theme: _theme }: { theme?: "light" | "dar
                   <span className="text-[#7342E2] dark:text-[#a882fa] text-sm font-bold bg-[#7342E2]/10 px-2 py-0.5 rounded-md">
                     ₹{activeService.price}
                   </span>
+                </div>
+              </div>
+            </div>
+
+            {/* 2-Column Description & Image Section (Checklist & Documents) */}
+            <div className="p-6 border-b border-neutral-200 dark:border-zinc-900 bg-neutral-50/20 dark:bg-zinc-950/10">
+              <div className="flex flex-col md:flex-row gap-8 items-start">
+                {/* Left Column: Description */}
+                <div className="flex-1 space-y-4">
+                  <h3 className="text-xl font-bold text-neutral-850 dark:text-neutral-250">
+                    Checklist & Documents
+                  </h3>
+                  <div className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed space-y-3 font-medium text-justify">
+                    {activeService.longDesc.split("\n\n").map((p: string, i: number) => (
+                      <p key={i}>{p}</p>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right Column: Certificate Image */}
+                <div className="w-full md:w-80 shrink-0 mx-auto">
+                  <div className="rounded-xl border border-neutral-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-2 shadow-md dark:shadow-none overflow-hidden max-w-full">
+                    <img 
+                      src={activeService.image} 
+                      alt={`${activeService.title} Visual`} 
+                      className="w-full h-auto rounded-lg object-contain bg-neutral-50 dark:bg-black" 
+                    />
+                  </div>
                 </div>
               </div>
             </div>

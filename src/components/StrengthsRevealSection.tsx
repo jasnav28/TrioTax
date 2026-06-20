@@ -29,8 +29,9 @@ export function StrengthsRevealSection({ theme, isProgrammaticScrolling }: { the
           const enteredFromBottom = rect.top > 0;
           if (enteredFromBottom) {
             setAnimationStarted(true);
-            // Smoothly scroll the section into full view so it's centered during animation
-            containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Scroll the window so the container is positioned perfectly below the sticky Navbar (80px offset)
+            const targetPosition = (window.scrollY || window.pageYOffset) + rect.top - 80;
+            window.scrollTo({ top: targetPosition, behavior: 'auto' });
           } else {
             // Entering from top (scrolling up), so skip animation and show instantly
             setShowRealSection(true);
@@ -45,6 +46,13 @@ export function StrengthsRevealSection({ theme, isProgrammaticScrolling }: { the
   }, [isInView, animationStarted, showRealSection, isProgrammaticScrolling]);
 
   const handleAnimationComplete = () => {
+    // Re-verify and snap window scroll position right before revealing the content to prevent half-view shifts
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (rect) {
+      const targetPosition = (window.scrollY || window.pageYOffset) + rect.top - 80;
+      window.scrollTo({ top: targetPosition, behavior: 'auto' });
+    }
+
     // Let the drawn line settle and be visible, then transition
     setTimeout(() => {
       setShowRealSection(true);
@@ -83,24 +91,27 @@ export function StrengthsRevealSection({ theme, isProgrammaticScrolling }: { the
       ref={containerRef} 
       className="relative w-full overflow-hidden min-h-[600px] lg:min-h-[700px] bg-black"
     >
-      <AnimatePresence mode="wait">
-        {!showRealSection ? (
+      <AnimatePresence>
+        {animationStarted && !showRealSection && (
           <motion.div
             key="reveal-screen"
-            initial={{ opacity: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="w-full flex items-center justify-center bg-black min-h-[600px] lg:min-h-[700px]"
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="fixed inset-0 w-screen h-screen z-[100] flex items-center justify-center bg-black flex-col"
           >
-            {animationStarted && (
-              <HandWrittenTitle 
-                title="Our Key Strength" 
-                subtitle="Why businesses choose TRIOTAX" 
-                onAnimationComplete={handleAnimationComplete}
-              />
-            )}
+            <HandWrittenTitle 
+              title="Our Key Strength" 
+              subtitle="Why businesses choose TRIOTAX" 
+              onAnimationComplete={handleAnimationComplete}
+            />
           </motion.div>
-        ) : (
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence mode="wait">
+        {showRealSection ? (
           <motion.div
             key="real-section"
             initial={{ opacity: 0 }}
@@ -110,6 +121,8 @@ export function StrengthsRevealSection({ theme, isProgrammaticScrolling }: { the
           >
             <MinimalistHeroDemo theme={theme} />
           </motion.div>
+        ) : (
+          <div className="w-full min-h-[600px] lg:min-h-[700px] bg-black" />
         )}
       </AnimatePresence>
     </div>
